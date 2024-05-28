@@ -1,60 +1,94 @@
-import './Hero.css';
-import Carousel from 'react-material-ui-carousel';
-import { Paper } from '@mui/material';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCirclePlay } from '@fortawesome/free-solid-svg-icons';
-import {Link, useNavigate} from "react-router-dom";
-import Button from 'react-bootstrap/Button';
+import "./Hero.css";
+import Carousel from "react-material-ui-carousel";
+import { Paper } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import ReactPlayer from "react-player";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import axios from "../../api/axiosConfig";
 
-
-const Hero = ({movies}) => {
-
-    const navigate = useNavigate();
-
-    function reviews(movieId)
-    {
-        navigate(`/Reviews/${movieId}`);
-    }
-
-  return (
-    <div className ='movie-carousel-container'>
-      <Carousel>
-        {
-            movies?.map((movie) =>{
-                return(
-                    <Paper key={movie.imdbId}>
-                        <div className = 'movie-card-container'>
-                            <div className="movie-card" style={{"--img": `url(${movie.backdrops[0]})`}}>
-                                <div className="movie-detail">
-                                    <div className="movie-poster">
-                                        <img src={movie.poster} alt="" />
-                                    </div>
-                                    <div className="movie-title">
-                                        <h4>{movie.title}</h4>
-                                    </div>
-                                    <div className="movie-buttons-container">
-                                        <Link to={`/Trailer/${movie.trailerLink.substring(movie.trailerLink.length - 11)}`}>
-                                            <div className="play-button-icon-container">
-                                                <FontAwesomeIcon className="play-button-icon"
-                                                    icon = {faCirclePlay}
-                                                />
-                                            </div>
-                                        </Link>
-
-                                        <div className="movie-review-button-container">
-                                            <Button variant ="info" onClick={() => reviews(movie.imdbId)} >Reviews</Button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </Paper>
-                )
-            })
+const Hero = ({ movies, watchList, setWatchList, setOpenLoginModal }) => {
+  const navigate = useNavigate();
+  function reviews(movieId) {
+    navigate(`/Reviews/${movieId}`);
+  }
+  const watchListFunc = async (imdbId, remove = false) => {
+    if (!sessionStorage.getItem("email")) setOpenLoginModal(true);
+    else {
+      try {
+        let watchList;
+        if (remove) {
+          watchList = await axios.put("api/v1/user", {
+            email: sessionStorage.getItem("email"),
+            imdbId,
+            action: "remove",
+          });
+        } else {
+          watchList = await axios.put("api/v1/user", {
+            email: sessionStorage.getItem("email"),
+            imdbId,
+          });
         }
+        setWatchList(watchList.data);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  };
+
+  const findMovie = (imdbId) => {
+    watchList &&
+      watchList.length > 0 &&
+      watchList.find((movie) => movie.imdbId === imdbId);
+  };
+  return (
+    <div className="movie-carousel-container">
+      <Carousel
+        autoPlay={false}
+        navButtonsAlwaysVisible={true}
+        indicators={false}
+      >
+        {movies?.map((movie) => {
+          return (
+            <Paper key={movie.imdbId}>
+              <div className="movie-card-container">
+                <div className="movie-card">
+                  <ReactPlayer
+                    playing={true}
+                    muted
+                    autoPlay
+                    url={movie.trailerLink}
+                    width="100%"
+                    height="100%"
+                  />
+                  <div className="movie-detail">
+                    <div className="movie-poster"  onClick={() => reviews(movie.imdbId)}>
+                      <img src={movie.poster} alt="" />
+                      {!findMovie(movie.imdbId) ? (
+                        <FontAwesomeIcon
+                          size="lg"
+                          icon={faHeart}
+                          onClick={() => watchListFunc(movie.imdbId)}
+                          className="watchlist"
+                        />
+                      ) : (
+                        <FontAwesomeIcon
+                          size="lg"
+                          icon={faHeart}
+                          onClick={() => watchListFunc(movie.imdbId, true)}
+                          className="watchlist-selected"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Paper>
+          );
+        })}
       </Carousel>
     </div>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;
