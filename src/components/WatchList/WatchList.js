@@ -36,7 +36,6 @@ const WatchList = ({ watchList, auth, setOpenLoginModal }) => {
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
-        fontSize: "26px",
       }}
     >
       Please login to view your watch List
