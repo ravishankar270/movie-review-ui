@@ -9,7 +9,6 @@ const WatchList = ({ watchList, auth, setOpenLoginModal }) => {
     navigate(`/Reviews/${movieId}`);
   }
   useEffect(() => {
-    console.log(watchList);
     !auth && !sessionStorage.getItem("email") && setOpenLoginModal(true);
   }, []);
 

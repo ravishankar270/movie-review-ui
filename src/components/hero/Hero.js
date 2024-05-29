@@ -12,7 +12,8 @@ const Hero = ({ movies, watchList, setWatchList, setOpenLoginModal }) => {
   function reviews(movieId) {
     navigate(`/Reviews/${movieId}`);
   }
-  const watchListFunc = async (imdbId, remove = false) => {
+  const watchListFunc = async (e,imdbId, remove = false) => {
+    e.stopPropagation();
     if (!sessionStorage.getItem("email")) setOpenLoginModal(true);
     else {
       try {
@@ -37,9 +38,11 @@ const Hero = ({ movies, watchList, setWatchList, setOpenLoginModal }) => {
   };
 
   const findMovie = (imdbId) => {
-    watchList &&
+    return (
+      watchList &&
       watchList.length > 0 &&
-      watchList.find((movie) => movie.imdbId === imdbId);
+      watchList.find((movie) => movie.imdbId === imdbId)
+    );
   };
   return (
     <div className="movie-carousel-container">
@@ -62,20 +65,23 @@ const Hero = ({ movies, watchList, setWatchList, setOpenLoginModal }) => {
                     height="100%"
                   />
                   <div className="movie-detail">
-                    <div className="movie-poster"  onClick={() => reviews(movie.imdbId)}>
+                    <div
+                      className="movie-poster"
+                      onClick={() => reviews(movie.imdbId)}
+                    >
                       <img src={movie.poster} alt="" />
                       {!findMovie(movie.imdbId) ? (
                         <FontAwesomeIcon
                           size="lg"
                           icon={faHeart}
-                          onClick={() => watchListFunc(movie.imdbId)}
+                          onClick={(e) => watchListFunc(e,movie.imdbId)}
                           className="watchlist"
                         />
                       ) : (
                         <FontAwesomeIcon
                           size="lg"
                           icon={faHeart}
-                          onClick={() => watchListFunc(movie.imdbId, true)}
+                          onClick={(e) => watchListFunc(e,movie.imdbId, true)}
                           className="watchlist-selected"
                         />
                       )}

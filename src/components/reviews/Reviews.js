@@ -12,7 +12,6 @@ const Reviews = ({ getMovieData, movie, reviews, setReviews }) => {
   const movieId = params.movieId;
 
   useEffect(() => {
-    console.log(movieId);
     getMovieData(movieId);
   }, []);
 
@@ -36,7 +35,6 @@ const Reviews = ({ getMovieData, movie, reviews, setReviews }) => {
       console.error(err);
     }
   };
-  console.log(reviews);
   return (
     <Container>
       <Row>
