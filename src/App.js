@@ -9,7 +9,7 @@ import Reviews from "./components/reviews/Reviews";
 import NotFound from "./components/notFound/NotFound";
 import Login from "./components/Login/Login";
 import WatchList from "./components/WatchList/WatchList";
-import axios from "./api/axiosConfig"; 
+import axios from "./api/axiosConfig";
 
 function App() {
   const [movies, setMovies] = useState();
@@ -18,10 +18,13 @@ function App() {
   const [auth, setAuth] = useState(false);
   const [openLoginModal, setOpenLoginModal] = useState(false);
   const [watchList, setWatchList] = useState([]);
+  const [loading, setLoading] = useState(false);
   const getMovies = async () => {
     try {
+      setLoading(true);
       const response = await api.get("/api/v1/movies");
       setMovies(response.data);
+      setLoading(false);
     } catch (err) {
       console.log(err);
     }
@@ -73,9 +76,10 @@ function App() {
             element={
               <Home
                 movies={movies}
-                watchList = {watchList}
+                watchList={watchList}
                 setWatchList={setWatchList}
                 setOpenLoginModal={setOpenLoginModal}
+                loading={loading}
               />
             }
           ></Route>
